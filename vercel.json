@@ -1,0 +1,11 @@
+{
+  "installCommand": "cd pisgame-frontend && npm install",
+  "buildCommand": "cd pisgame-frontend && npm run build",
+  "outputDirectory": "pisgame-frontend/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
