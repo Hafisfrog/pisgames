@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { LogIn } from 'lucide-react'
 import { defaultForms, medalLabels } from '../../constants/forms'
-import { apiRequest } from '../../utils/api'
+import { apiRequest, apiUrl } from '../../utils/api'
 import { cleanPayload } from '../../utils/format'
 import { TabButton } from '../common/TabButton'
 import { AdminSection } from './AdminSection'
@@ -22,7 +22,7 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
     setMessage('')
 
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch(apiUrl('/api/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginForm),
