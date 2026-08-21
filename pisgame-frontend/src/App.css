@@ -758,16 +758,35 @@ td {
     min-height: auto;
     align-items: stretch;
     flex-direction: column;
-    gap: 14px;
-    padding: 16px;
+    gap: 12px;
+    padding: 12px 14px;
   }
 
   .brand {
-    font-size: 20px;
+    gap: 10px;
+    font-size: 18px;
+  }
+
+  .crest {
+    width: 48px;
+    height: 48px;
   }
 
   .login-button {
     width: 100%;
+    min-height: 42px;
+    padding: 0 16px;
+    font-size: 15px;
+  }
+
+  .login-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .dashboard-content {
+    width: calc(100% - 24px);
+    padding: 18px 0 36px;
   }
 
   .announcement,
@@ -785,8 +804,54 @@ td {
     grid-template-columns: 1fr;
   }
 
+  .content-heading {
+    gap: 12px;
+    margin: 18px 0 16px;
+  }
+
   h1 {
+    gap: 8px;
+    font-size: 22px;
+  }
+
+  h1 svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  h2 {
+    font-size: 19px;
+  }
+
+  .updated-pill {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 15px;
+  }
+
+  .overview-grid {
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .overview-card {
+    min-height: 86px;
+    padding: 16px 18px;
+    border-radius: 8px;
+  }
+
+  .overview-card span {
+    font-size: 14px;
+  }
+
+  .overview-card strong {
+    margin-top: 4px;
     font-size: 28px;
+  }
+
+  .overview-card svg {
+    width: 32px;
+    height: 32px;
   }
 
   .section-heading {
