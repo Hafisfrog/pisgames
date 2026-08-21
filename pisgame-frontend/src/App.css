@@ -139,6 +139,100 @@
   font-weight: 900;
 }
 
+.header-actions {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid #bcd8f5;
+  border-radius: 8px;
+  color: #0f5fad;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.menu-button:hover,
+.menu-button[aria-expanded='true'] {
+  color: #ffffff;
+  border-color: #0f5fad;
+  background: #0f5fad;
+}
+
+.header-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 20;
+  display: grid;
+  gap: 12px;
+  width: 240px;
+  border: 1px solid #dbe3ee;
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
+}
+
+.menu-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.flag-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.language-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.language-options button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  border: 1px solid #dbe3ee;
+  border-radius: 8px;
+  padding: 0 10px;
+  color: #334155;
+  background: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+}
+
+.language-options button.active {
+  color: #0f5fad;
+  border-color: #bcd8f5;
+  background: #eff6ff;
+}
+
+.menu-login-button {
+  width: 100%;
+  min-height: 42px;
+}
+
 .dashboard-content {
   width: min(1440px, calc(100% - 48px));
   margin: 0 auto;
@@ -756,10 +850,18 @@ td {
   .site-header,
   .admin-topbar {
     min-height: auto;
-    align-items: stretch;
-    flex-direction: column;
     gap: 12px;
     padding: 12px 14px;
+  }
+
+  .site-header {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .admin-topbar {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .brand {
@@ -772,14 +874,22 @@ td {
     height: 48px;
   }
 
-  .login-button {
-    width: 100%;
+  .menu-button {
+    width: 42px;
+    height: 42px;
+  }
+
+  .header-menu {
+    width: min(260px, calc(100vw - 28px));
+  }
+
+  .menu-login-button {
     min-height: 42px;
     padding: 0 16px;
     font-size: 15px;
   }
 
-  .login-button svg {
+  .menu-login-button svg {
     width: 20px;
     height: 20px;
   }

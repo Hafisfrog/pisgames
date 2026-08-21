@@ -1,12 +1,12 @@
 import { Trophy } from 'lucide-react'
 import { StateMessage } from '../common/StateMessage'
 
-export function MedalTable({ standings }) {
+export function MedalTable({ standings, labels }) {
   if (standings.length === 0) {
     return (
       <StateMessage
-        title="ยังไม่มีข้อมูลเหรียญ"
-        text="เพิ่มทีมและผลการแข่งขันจากฝั่งแอดมินก่อน"
+        title={labels.medalsEmptyTitle}
+        text={labels.medalsEmptyText}
       />
     )
   }
@@ -16,7 +16,7 @@ export function MedalTable({ standings }) {
       <div className="section-heading">
         <h2>
           <Trophy size={26} />
-          ตารางคะแนนรวม
+          {labels.standingsTitle}
           <span className="live-badge">LIVE</span>
         </h2>
       </div>
@@ -24,12 +24,12 @@ export function MedalTable({ standings }) {
         <table>
           <thead>
             <tr>
-              <th>อันดับ</th>
-              <th>คณะสี</th>
-              <th>ทอง</th>
-              <th>เงิน</th>
-              <th>ทองแดง</th>
-              <th>รวมคะแนน</th>
+              <th>{labels.rank}</th>
+              <th>{labels.teams}</th>
+              <th>{labels.gold}</th>
+              <th>{labels.silver}</th>
+              <th>{labels.bronze}</th>
+              <th>{labels.totalScore}</th>
             </tr>
           </thead>
           <tbody>
@@ -42,7 +42,7 @@ export function MedalTable({ standings }) {
                       className="swatch"
                       style={{ backgroundColor: team.color || '#111827' }}
                     />
-                    {team.team_name}
+                    {labels.teamNames[team.team_name] ?? team.team_name}
                   </div>
                 </td>
                 <td className="gold-number">{team.gold}</td>

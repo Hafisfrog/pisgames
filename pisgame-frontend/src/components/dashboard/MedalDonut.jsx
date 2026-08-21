@@ -1,6 +1,6 @@
 import { PieChart } from 'lucide-react'
 
-export function MedalDonut({ standings, totals }) {
+export function MedalDonut({ standings, totals, labels }) {
   const slices = standings.filter((team) => team.total > 0)
   let current = 0
   const gradient =
@@ -20,21 +20,21 @@ export function MedalDonut({ standings, totals }) {
       <div className="section-heading">
         <h2>
           <PieChart size={26} />
-          สัดส่วนเหรียญรวม
+          {labels.donutTitle}
         </h2>
       </div>
       <div className="donut-wrap">
         <div className="donut" style={{ background: `conic-gradient(${gradient})` }}>
           <div>
             <strong>{totals.total}</strong>
-            <span>เหรียญ</span>
+            <span>{labels.medalUnit}</span>
           </div>
         </div>
         <div className="legend">
           {standings.map((team) => (
             <span key={team.team_id}>
               <i style={{ backgroundColor: team.color || '#111827' }} />
-              {team.team_name}
+              {labels.teamNames[team.team_name] ?? team.team_name}
             </span>
           ))}
         </div>
