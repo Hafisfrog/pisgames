@@ -15,7 +15,6 @@ import {
 import { BrandMark } from '../common/BrandMark'
 import { StateMessage } from '../common/StateMessage'
 import { EventList } from './EventList'
-import { MedalDonut } from './MedalDonut'
 import { MedalTable } from './MedalTable'
 import { OverviewCard } from './OverviewCard'
 
@@ -40,7 +39,7 @@ const labels = {
     athletes: 'นักกีฬา',
     completedEvents: 'แข่งขันนี้',
     sportTypes: 'ประเภทกีฬา',
-    eventSchedule: 'ตารางการแข่งขัน',
+    eventSchedule: 'ผลการแข่งขัน',
     completedSummary: (completed, total) => `แข่งเสร็จแล้ว ${completed} จาก ${total} รายการ`,
     medalsEmptyTitle: 'ยังไม่มีข้อมูลเหรียญ',
     medalsEmptyText: 'เพิ่มทีมและผลการแข่งขันจากฝั่งแอดมินก่อน',
@@ -122,7 +121,6 @@ export function DashboardLayout({
   events,
   sports,
   teams,
-  totals,
   loading,
   error,
   openAdmin,
@@ -292,7 +290,6 @@ export function DashboardLayout({
 
               <section className="dashboard-grid">
                 <MedalTable standings={standings} labels={text} />
-                <MedalDonut standings={standings} totals={totals} labels={text} />
               </section>
 
               <section className="panel event-panel" id="events">
