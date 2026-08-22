@@ -197,6 +197,16 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
     )
   }
 
+  function eventOptionLabel(event) {
+    return [
+      event.name,
+      event.gender || 'ไม่ระบุเพศ',
+      event.category ? `รุ่น ${event.category}` : 'ไม่ระบุรุ่น',
+    ]
+      .filter(Boolean)
+      .join(' | ')
+  }
+
   async function saveDetailEvent(sport) {
     const payload = cleanPayload({
       sport_id: sport.id,
@@ -623,7 +633,7 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
           items={events.flatMap((event) =>
             (event.results ?? []).map((result) => ({
               ...result,
-              eventName: event.name,
+              eventName: eventOptionLabel(event),
             })),
           )}
           renderItem={(result) => (
@@ -650,7 +660,7 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
               <option value="">เลือกรายการแข่งขัน</option>
               {events.map((event) => (
                 <option key={event.id} value={event.id}>
-                  {event.name}
+                  {eventOptionLabel(event)}
                 </option>
               ))}
             </select>
