@@ -7,9 +7,13 @@
   position: fixed;
   inset: 94px auto 0 0;
   width: 292px;
+  max-height: calc(100vh - 94px);
   border-right: 1px solid #dbe3ee;
   padding: 24px 18px;
   background: #ffffff;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .main-area {
@@ -88,19 +92,26 @@
 .side-nav {
   display: grid;
   gap: 8px;
+  padding-bottom: 18px;
 }
 
-.side-nav a {
+.side-nav a,
+.side-nav button {
   display: flex;
   align-items: center;
   gap: 12px;
   min-height: 48px;
   border-radius: 8px;
+  border: 0;
   padding: 0 22px;
   color: #5b6878;
+  background: transparent;
   text-decoration: none;
   font-size: 16px;
   font-weight: 800;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
 }
 
 .side-nav a.active {
@@ -111,6 +122,86 @@
 
 .side-nav a:nth-child(2) {
   color: #f5ae00;
+}
+
+.nav-button {
+  width: 100%;
+}
+
+.nav-button.nav-button-open {
+  color: #f5ae00;
+  background: #fff8e5;
+}
+
+.nav-button span:not(.nav-caret) {
+  flex: 1;
+  min-width: 0;
+}
+
+.nav-caret {
+  margin-left: auto;
+  font-size: 14px;
+}
+
+.event-nav-tree {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 10px 28px;
+  border-left: 2px solid #dbe3ee;
+  padding-left: 12px;
+}
+
+.event-nav-sport {
+  display: grid;
+  gap: 6px;
+}
+
+.event-nav-sport-button,
+.event-nav-groups button {
+  min-height: 36px !important;
+  border-radius: 8px !important;
+  padding: 6px 10px !important;
+  font-size: 14px !important;
+}
+
+.event-nav-sport-button {
+  justify-content: space-between;
+  color: #334155 !important;
+  background: #ffffff !important;
+}
+
+.event-nav-sport-button.active {
+  color: #0f5fad !important;
+  background: #eff6ff !important;
+}
+
+.event-nav-sport-button small {
+  color: #64748b;
+  font-weight: 900;
+}
+
+.event-nav-groups {
+  display: grid;
+  gap: 4px;
+  padding-left: 10px;
+}
+
+.event-nav-groups button {
+  justify-content: flex-start;
+  color: #64748b !important;
+  background: transparent !important;
+}
+
+.event-nav-groups button.active {
+  color: #ffffff !important;
+  background: #0f5fad !important;
+}
+
+.event-nav-empty {
+  padding: 4px 10px;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .committee-label {
@@ -566,6 +657,38 @@ td {
 
 .event-list {
   display: grid;
+}
+
+.event-select-state {
+  display: grid;
+  gap: 6px;
+  padding: 28px 24px;
+  color: #64748b;
+}
+
+.event-select-state strong {
+  color: #0f5fad;
+  font-size: 18px;
+}
+
+.event-filter-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid #d5dde8;
+  padding: 14px 24px;
+  background: #f8fbff;
+}
+
+.event-filter-heading strong {
+  color: #0f5fad;
+  font-size: 18px;
+}
+
+.event-filter-heading span {
+  color: #64748b;
+  font-weight: 900;
 }
 
 .event-row {

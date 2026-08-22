@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { LogIn } from 'lucide-react'
 import { defaultForms, medalLabels } from '../../constants/forms'
-import { apiRequest, apiUrl } from '../../utils/api'
+import { apiRequest, apiUrl, fetchWithTimeout } from '../../utils/api'
 import { cleanPayload, formatDate } from '../../utils/format'
 import { TabButton } from '../common/TabButton'
 import { AdminSection } from './AdminSection'
@@ -15,8 +15,8 @@ const defaultDetailEventForm = {
 export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
   const [adminTab, setAdminTab] = useState('teams')
   const [loginForm, setLoginForm] = useState({
-    email: 'admin@sportsday.com',
-    password: 'password',
+    email: '',
+    password: '',
   })
   const [forms, setForms] = useState(defaultForms)
   const [message, setMessage] = useState('')
@@ -32,7 +32,7 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
     setMessage('')
 
     try {
-      const res = await fetch(apiUrl('/api/login'), {
+      const res = await fetchWithTimeout(apiUrl('/api/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginForm),
@@ -401,6 +401,7 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
                   setLoginForm((current) => ({ ...current, email: event.target.value }))
                 }
                 type="email"
+                autoComplete="username"
                 required
               />
             </label>
@@ -412,6 +413,7 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
                   setLoginForm((current) => ({ ...current, password: event.target.value }))
                 }
                 type="password"
+                autoComplete="current-password"
                 required
               />
             </label>

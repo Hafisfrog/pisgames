@@ -1,7 +1,28 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? ''
+const REQUEST_TIMEOUT_MS = 15000
 
 export function apiUrl(path) {
   return `${API_BASE_URL}${path}`
+}
+
+export async function fetchWithTimeout(url, options = {}) {
+  const controller = new AbortController()
+  const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+
+  try {
+    return await fetch(url, {
+      ...options,
+      signal: options.signal ?? controller.signal,
+    })
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('เชื่อมต่อ backend ไม่สำเร็จ กรุณาตรวจสอบ API URL หรืออินเทอร์เน็ต')
+    }
+
+    throw err
+  } finally {
+    window.clearTimeout(timeout)
+  }
 }
 
 async function parseJsonResponse(res) {
@@ -20,10 +41,10 @@ async function parseJsonResponse(res) {
 
 export async function fetchDashboardData() {
   const [standingsRes, eventsRes, sportsRes, teamsRes] = await Promise.all([
-    fetch(apiUrl('/api/standings')),
-    fetch(apiUrl('/api/events')),
-    fetch(apiUrl('/api/sports')),
-    fetch(apiUrl('/api/teams')),
+    fetchWithTimeout(apiUrl('/api/standings')),
+    fetchWithTimeout(apiUrl('/api/events')),
+    fetchWithTimeout(apiUrl('/api/sports')),
+    fetchWithTimeout(apiUrl('/api/teams')),
   ])
 
   if (!standingsRes.ok || !eventsRes.ok || !sportsRes.ok || !teamsRes.ok) {
@@ -44,7 +65,7 @@ export async function fetchDashboardData() {
 }
 
 export async function apiRequest(path, token, options = {}) {
-  const res = await fetch(apiUrl(path), {
+  const res = await fetchWithTimeout(apiUrl(path), {
     ...options,
     headers: {
       'Content-Type': 'application/json',

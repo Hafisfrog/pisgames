@@ -8,9 +8,7 @@ import {
   Flag,
   Menu,
   PieChart,
-  Radio,
   Shield,
-  Users,
 } from 'lucide-react'
 import { BrandMark } from '../common/BrandMark'
 import { StateMessage } from '../common/StateMessage'
@@ -129,8 +127,17 @@ export function DashboardLayout({
   const now = new Date()
   const menuRef = useRef(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [eventsNavOpen, setEventsNavOpen] = useState(false)
+  const [expandedSportId, setExpandedSportId] = useState(null)
+  const [mobileSportId, setMobileSportId] = useState('')
+  const [selectedEventGroup, setSelectedEventGroup] = useState(null)
   const [language, setLanguage] = useState(() => localStorage.getItem('dashboard_language') || 'th')
   const text = labels[language] ?? labels.th
+  const sportNavItems = buildSportNavItems(events, sports)
+  const selectedMobileSport = sportNavItems.find((item) => String(item.id) === mobileSportId)
+  const filteredEvents = selectedEventGroup
+    ? events.filter((event) => eventGroupKey(event) === selectedEventGroup.key)
+    : []
 
   useEffect(() => {
     document.documentElement.lang = language === 'ms' ? 'ms' : 'th'
@@ -162,6 +169,47 @@ export function DashboardLayout({
     openAdmin()
   }
 
+  function scrollToEvents() {
+    window.requestAnimationFrame(() => {
+      document.getElementById('events')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
+  function toggleEventsNav() {
+    setEventsNavOpen((isOpen) => !isOpen)
+    scrollToEvents()
+  }
+
+  function toggleSport(sportId) {
+    setEventsNavOpen(true)
+    setExpandedSportId((current) => (current === sportId ? null : sportId))
+    scrollToEvents()
+  }
+
+  function selectEventGroup(sport, group) {
+    setSelectedEventGroup({
+      ...group,
+      sportName: sport.name,
+      label: eventGroupLabel(group),
+    })
+    setMobileSportId(String(sport.id))
+    scrollToEvents()
+  }
+
+  function selectMobileSport(nextSportId) {
+    setMobileSportId(nextSportId)
+    setSelectedEventGroup(null)
+    setExpandedSportId(nextSportId || null)
+  }
+
+  function selectMobileEventGroup(groupKey) {
+    const group = selectedMobileSport?.groups.find((item) => item.key === groupKey)
+
+    if (selectedMobileSport && group) {
+      selectEventGroup(selectedMobileSport, group)
+    }
+  }
+
   return (
     <div className="dashboard-shell">
       <aside className="sidebar">
@@ -179,10 +227,51 @@ export function DashboardLayout({
             <Radio size={20} />
             ถ่ายทอดสด (Live)
           </a> */}
-          <a href="#events">
+          <button
+            className={eventsNavOpen ? 'nav-button nav-button-open' : 'nav-button'}
+            type="button"
+            onClick={toggleEventsNav}
+          >
             <CalendarDays size={20} />
-            {text.eventsNav}
-          </a>
+            <span>{text.eventsNav}</span>
+            <span className="nav-caret">{eventsNavOpen ? '▾' : '▸'}</span>
+          </button>
+          {eventsNavOpen && (
+            <div className="event-nav-tree">
+              {sportNavItems.length === 0 && (
+                <span className="event-nav-empty">{text.emptyEvents}</span>
+              )}
+              {sportNavItems.map((item) => (
+                <div className="event-nav-sport" key={item.id}>
+                  <button
+                    className={expandedSportId === item.id ? 'event-nav-sport-button active' : 'event-nav-sport-button'}
+                    type="button"
+                    onClick={() => toggleSport(item.id)}
+                  >
+                    <span>{item.name}</span>
+                    <small>{item.events.length}</small>
+                  </button>
+                  {expandedSportId === item.id && (
+                    <div className="event-nav-groups">
+                      {item.groups.length === 0 && (
+                        <span className="event-nav-empty">ยังไม่มีประเภท</span>
+                      )}
+                      {item.groups.map((group) => (
+                        <button
+                          className={selectedEventGroup?.key === group.key ? 'active' : ''}
+                          type="button"
+                          key={group.key}
+                          onClick={() => selectEventGroup(item, group)}
+                        >
+                          {eventGroupLabel(group)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </nav>
         <div className="committee-label">{text.committee}</div>
       </aside>
@@ -302,7 +391,36 @@ export function DashboardLayout({
                     {text.completedSummary(completedEvents.length, events.length)}
                   </p>
                 </div>
-                <EventList events={events} labels={text} />
+                <div className="mobile-event-picker">
+                  <select
+                    value={mobileSportId}
+                    onChange={(event) => selectMobileSport(event.target.value)}
+                  >
+                    <option value="">เลือกชนิดกีฬา</option>
+                    {sportNavItems.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={selectedEventGroup?.key ?? ''}
+                    onChange={(event) => selectMobileEventGroup(event.target.value)}
+                    disabled={!selectedMobileSport}
+                  >
+                    <option value="">เลือกประเภท / เพศ / รุ่น</option>
+                    {(selectedMobileSport?.groups ?? []).map((group) => (
+                      <option key={group.key} value={group.key}>
+                        {eventGroupLabel(group)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <EventList
+                  events={filteredEvents}
+                  labels={text}
+                  selectedGroup={selectedEventGroup}
+                />
               </section>
             </>
           )}
@@ -310,4 +428,59 @@ export function DashboardLayout({
       </div>
     </div>
   )
+}
+
+function eventGroupKey(event) {
+  const sportId = event.sport_id ?? event.sport?.id ?? 'unknown'
+  return [sportId, event.gender || '', event.category || ''].join('|')
+}
+
+function eventGroupLabel(group) {
+  return [group.gender || 'ไม่ระบุเพศ', group.category ? `รุ่น ${group.category}` : 'ไม่ระบุรุ่น'].join(' | ')
+}
+
+function buildSportNavItems(events, sports) {
+  const sportsById = new Map(sports.map((sport) => [sport.id, sport]))
+  const itemsById = new Map()
+
+  events.forEach((event) => {
+    const sportId = event.sport_id ?? event.sport?.id ?? `unknown-${event.sport?.name ?? 'sport'}`
+    const sport = sportsById.get(sportId) ?? event.sport ?? {
+      id: sportId,
+      name: 'ไม่ระบุกีฬา',
+    }
+
+    if (!itemsById.has(sportId)) {
+      itemsById.set(sportId, {
+        id: sportId,
+        name: sport.name,
+        events: [],
+        groupsByKey: new Map(),
+      })
+    }
+
+    const item = itemsById.get(sportId)
+    const key = eventGroupKey(event)
+    item.events.push(event)
+
+    if (!item.groupsByKey.has(key)) {
+      item.groupsByKey.set(key, {
+        key,
+        gender: event.gender,
+        category: event.category,
+        events: [],
+      })
+    }
+
+    item.groupsByKey.get(key).events.push(event)
+  })
+
+  return Array.from(itemsById.values())
+    .sort((a, b) => a.name.localeCompare(b.name, 'th'))
+    .map((item) => ({
+      ...item,
+      groups: Array.from(item.groupsByKey.values()).sort((a, b) =>
+        eventGroupLabel(a).localeCompare(eventGroupLabel(b), 'th'),
+      ),
+    }))
 }

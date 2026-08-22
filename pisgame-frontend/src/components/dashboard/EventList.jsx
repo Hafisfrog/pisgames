@@ -1,13 +1,26 @@
 import { medalLabels } from '../../constants/forms'
 import { formatDate } from '../../utils/format'
 
-export function EventList({ events, labels }) {
+export function EventList({ events, labels, selectedGroup }) {
+  if (!selectedGroup) {
+    return (
+      <div className="event-select-state">
+        <strong>เลือกผลการแข่งขันจากเมนูด้านซ้าย</strong>
+        <span>กดชนิดกีฬา แล้วเลือกประเภท เช่น ชาย/หญิง หรือรุ่นที่ต้องการดู</span>
+      </div>
+    )
+  }
+
   if (events.length === 0) {
     return <p className="empty-text">{labels.emptyEvents}</p>
   }
 
   return (
     <div className="event-list">
+      <div className="event-filter-heading">
+        <strong>{selectedGroup.sportName}</strong>
+        <span>{selectedGroup.label}</span>
+      </div>
       {events.map((event) => (
         <article className="event-row" key={event.id}>
           <div>
