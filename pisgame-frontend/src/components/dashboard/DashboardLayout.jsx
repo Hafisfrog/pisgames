@@ -24,8 +24,7 @@ const labels = {
     appName: 'พัฒนาเกมส์',
     year: 'ประจำปี 2026',
     dashboardNav: 'หน้าหลัก (Dashboard)',
-    eventsNav: 'ตารางการแข่งขัน',
-    committee: 'สำหรับกรรมการ',
+    eventsNav: 'ผลการแข่งขัน',
     openMenu: 'เปิดเมนู',
     languageAria: 'เลือกภาษา',
     translate: 'แปลภาษา',
@@ -282,18 +281,7 @@ export function DashboardLayout({
                   value={teams.length}
                   icon={<Flag size={42} />}
                 />
-                <OverviewCard
-                  tone="red"
-                  label={text.athletes}
-                  value={standings.length}
-                  icon={<Users size={42} />}
-                />
-                <OverviewCard
-                  tone="green"
-                  label={text.completedEvents}
-                  value={completedEvents.length}
-                  icon={<Clock3 size={42} />}
-                />
+               
                 <OverviewCard
                   tone="yellow"
                   label={text.sportTypes}
