@@ -129,12 +129,10 @@ export function DashboardLayout({
   const [menuOpen, setMenuOpen] = useState(false)
   const [eventsNavOpen, setEventsNavOpen] = useState(false)
   const [expandedSportId, setExpandedSportId] = useState(null)
-  const [mobileSportId, setMobileSportId] = useState('')
   const [selectedEventGroup, setSelectedEventGroup] = useState(null)
   const [language, setLanguage] = useState(() => localStorage.getItem('dashboard_language') || 'th')
   const text = labels[language] ?? labels.th
   const sportNavItems = buildSportNavItems(events, sports)
-  const selectedMobileSport = sportNavItems.find((item) => String(item.id) === mobileSportId)
   const filteredEvents = selectedEventGroup
     ? events.filter((event) => eventGroupKey(event) === selectedEventGroup.key)
     : []
@@ -192,22 +190,7 @@ export function DashboardLayout({
       sportName: sport.name,
       label: eventGroupLabel(group),
     })
-    setMobileSportId(String(sport.id))
     scrollToEvents()
-  }
-
-  function selectMobileSport(nextSportId) {
-    setMobileSportId(nextSportId)
-    setSelectedEventGroup(null)
-    setExpandedSportId(nextSportId || null)
-  }
-
-  function selectMobileEventGroup(groupKey) {
-    const group = selectedMobileSport?.groups.find((item) => item.key === groupKey)
-
-    if (selectedMobileSport && group) {
-      selectEventGroup(selectedMobileSport, group)
-    }
   }
 
   return (
@@ -390,31 +373,6 @@ export function DashboardLayout({
                   <p>
                     {text.completedSummary(completedEvents.length, events.length)}
                   </p>
-                </div>
-                <div className="mobile-event-picker">
-                  <select
-                    value={mobileSportId}
-                    onChange={(event) => selectMobileSport(event.target.value)}
-                  >
-                    <option value="">เลือกชนิดกีฬา</option>
-                    {sportNavItems.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.name}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    value={selectedEventGroup?.key ?? ''}
-                    onChange={(event) => selectMobileEventGroup(event.target.value)}
-                    disabled={!selectedMobileSport}
-                  >
-                    <option value="">เลือกประเภท / เพศ / รุ่น</option>
-                    {(selectedMobileSport?.groups ?? []).map((group) => (
-                      <option key={group.key} value={group.key}>
-                        {eventGroupLabel(group)}
-                      </option>
-                    ))}
-                  </select>
                 </div>
                 <EventList
                   events={filteredEvents}
