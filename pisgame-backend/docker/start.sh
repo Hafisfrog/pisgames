@@ -11,7 +11,10 @@ php artisan route:clear
 php artisan view:clear
 
 php artisan migrate --force
-php artisan db:seed --force
+
+if [ "${RUN_SEEDERS:-false}" = "true" ]; then
+  php artisan db:seed --force
+fi
 
 php artisan config:cache
 php artisan route:cache
