@@ -659,6 +659,99 @@ td {
   display: grid;
 }
 
+.event-block-list {
+  gap: 16px;
+  padding: 18px 24px 24px;
+}
+
+.event-filter-control {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  min-width: min(100%, 320px);
+}
+
+.event-filter-control label {
+  color: #334155;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.event-filter-control select {
+  width: min(100%, 320px);
+  min-height: 40px;
+  border: 1px solid #d9e5f1;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #111827;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 800;
+}
+
+.event-filter-control p {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.event-sport-block {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #d9e5f1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.event-sport-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  background: #f8fbff;
+}
+
+.event-sport-heading p {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.event-sport-heading span,
+.event-type-heading span {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.event-type-list {
+  display: grid;
+  gap: 12px;
+  padding: 0 14px 14px;
+}
+
+.event-type-block {
+  display: grid;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.event-type-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #ffffff7a;
+}
+
+.event-type-heading strong {
+  color: #0f5fad;
+}
+
 .event-select-state {
   display: grid;
   gap: 6px;
@@ -1190,6 +1283,8 @@ td {
   .announcement,
   .content-heading,
   .event-row,
+  .event-sport-heading,
+  .event-type-heading,
   .admin-header {
     align-items: stretch;
     flex-direction: column;
@@ -1271,6 +1366,18 @@ td {
 
   .medal-stack {
     justify-content: flex-start;
+  }
+
+  .event-filter-control {
+    justify-items: stretch;
+  }
+
+  .event-filter-control select {
+    width: 100%;
+  }
+
+  .event-block-list {
+    padding: 14px;
   }
 
   .admin-list-row {

@@ -50,6 +50,8 @@ const labels = {
     donutTitle: 'สัดส่วนเหรียญรวม',
     medalUnit: 'เหรียญ',
     emptyEvents: 'ยังไม่มีรายการแข่งขัน',
+    allSports: 'กีฬาทั้งหมด',
+    sportFilterLabel: 'เลือกประเภทกีฬา',
     unknownSport: 'ไม่ระบุกีฬา',
     unknownDetails: 'ยังไม่ระบุรายละเอียด',
     pending: 'รอผล',
@@ -98,6 +100,8 @@ const labels = {
     donutTitle: 'Nisbah jumlah pingat',
     medalUnit: 'Pingat',
     emptyEvents: 'Tiada acara pertandingan',
+    allSports: 'Semua sukan',
+    sportFilterLabel: 'Pilih jenis sukan',
     unknownSport: 'Sukan tidak dinyatakan',
     unknownDetails: 'Butiran belum ditetapkan',
     pending: 'Menunggu keputusan',
@@ -128,14 +132,13 @@ export function DashboardLayout({
   const menuRef = useRef(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [eventsNavOpen, setEventsNavOpen] = useState(false)
-  const [expandedSportId, setExpandedSportId] = useState(null)
-  const [selectedEventGroup, setSelectedEventGroup] = useState(null)
+  const [selectedSportId, setSelectedSportId] = useState('all')
   const [language, setLanguage] = useState(() => localStorage.getItem('dashboard_language') || 'th')
   const text = labels[language] ?? labels.th
   const sportNavItems = buildSportNavItems(events, sports)
-  const filteredEvents = selectedEventGroup
-    ? events.filter((event) => eventGroupKey(event) === selectedEventGroup.key)
-    : []
+  const filteredEvents = selectedSportId === 'all'
+    ? events
+    : events.filter((event) => String(event.sport_id ?? event.sport?.id ?? '') === selectedSportId)
 
   useEffect(() => {
     document.documentElement.lang = language === 'ms' ? 'ms' : 'th'
@@ -175,21 +178,13 @@ export function DashboardLayout({
 
   function toggleEventsNav() {
     setEventsNavOpen((isOpen) => !isOpen)
+    setSelectedSportId('all')
     scrollToEvents()
   }
 
-  function toggleSport(sportId) {
+  function selectSportFilter(sportId) {
     setEventsNavOpen(true)
-    setExpandedSportId((current) => (current === sportId ? null : sportId))
-    scrollToEvents()
-  }
-
-  function selectEventGroup(sport, group) {
-    setSelectedEventGroup({
-      ...group,
-      sportName: sport.name,
-      label: eventGroupLabel(group),
-    })
+    setSelectedSportId(String(sportId))
     scrollToEvents()
   }
 
@@ -227,30 +222,13 @@ export function DashboardLayout({
               {sportNavItems.map((item) => (
                 <div className="event-nav-sport" key={item.id}>
                   <button
-                    className={expandedSportId === item.id ? 'event-nav-sport-button active' : 'event-nav-sport-button'}
+                    className={selectedSportId === String(item.id) ? 'event-nav-sport-button active' : 'event-nav-sport-button'}
                     type="button"
-                    onClick={() => toggleSport(item.id)}
+                    onClick={() => selectSportFilter(item.id)}
                   >
                     <span>{item.name}</span>
                     <small>{item.events.length}</small>
                   </button>
-                  {expandedSportId === item.id && (
-                    <div className="event-nav-groups">
-                      {item.groups.length === 0 && (
-                        <span className="event-nav-empty">ยังไม่มีประเภท</span>
-                      )}
-                      {item.groups.map((group) => (
-                        <button
-                          className={selectedEventGroup?.key === group.key ? 'active' : ''}
-                          type="button"
-                          key={group.key}
-                          onClick={() => selectEventGroup(item, group)}
-                        >
-                          {eventGroupLabel(group)}
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -370,14 +348,26 @@ export function DashboardLayout({
                     <CalendarDays size={24} />
                     {text.eventSchedule}
                   </h2>
-                  <p>
-                    {text.completedSummary(completedEvents.length, events.length)}
-                  </p>
+                  <div className="event-filter-control">
+                    <label htmlFor="sport-filter">{text.sportFilterLabel}</label>
+                    <select
+                      id="sport-filter"
+                      value={selectedSportId}
+                      onChange={(event) => setSelectedSportId(event.target.value)}
+                    >
+                      <option value="all">{text.allSports}</option>
+                      {sportNavItems.map((item) => (
+                        <option key={item.id} value={String(item.id)}>
+                          {item.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p>{text.completedSummary(completedEvents.length, events.length)}</p>
+                  </div>
                 </div>
                 <EventList
                   events={filteredEvents}
                   labels={text}
-                  selectedGroup={selectedEventGroup}
                 />
               </section>
             </>
@@ -386,15 +376,6 @@ export function DashboardLayout({
       </div>
     </div>
   )
-}
-
-function eventGroupKey(event) {
-  const sportId = event.sport_id ?? event.sport?.id ?? 'unknown'
-  return [sportId, event.gender || '', event.category || ''].join('|')
-}
-
-function eventGroupLabel(group) {
-  return [group.gender || 'ไม่ระบุเพศ', group.category ? `รุ่น ${group.category}` : 'ไม่ระบุรุ่น'].join(' | ')
 }
 
 function buildSportNavItems(events, sports) {
@@ -413,32 +394,11 @@ function buildSportNavItems(events, sports) {
         id: sportId,
         name: sport.name,
         events: [],
-        groupsByKey: new Map(),
       })
     }
 
-    const item = itemsById.get(sportId)
-    const key = eventGroupKey(event)
-    item.events.push(event)
-
-    if (!item.groupsByKey.has(key)) {
-      item.groupsByKey.set(key, {
-        key,
-        gender: event.gender,
-        category: event.category,
-        events: [],
-      })
-    }
-
-    item.groupsByKey.get(key).events.push(event)
+    itemsById.get(sportId).events.push(event)
   })
 
-  return Array.from(itemsById.values())
-    .sort((a, b) => a.name.localeCompare(b.name, 'th'))
-    .map((item) => ({
-      ...item,
-      groups: Array.from(item.groupsByKey.values()).sort((a, b) =>
-        eventGroupLabel(a).localeCompare(eventGroupLabel(b), 'th'),
-      ),
-    }))
+  return Array.from(itemsById.values()).sort((a, b) => a.name.localeCompare(b.name, 'th'))
 }
