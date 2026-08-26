@@ -25,6 +25,23 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
   const [selectedDetail, setSelectedDetail] = useState(null)
   const [detailEventForm, setDetailEventForm] = useState(defaultDetailEventForm)
   const [editingDetailEvent, setEditingDetailEvent] = useState(null)
+  const resultItems = events.flatMap((event) =>
+    (event.results ?? []).map((result) => ({
+      ...result,
+      eventName: eventOptionLabel(event),
+    })),
+  )
+  const availableResultEvents = events.filter((event) =>
+    editing?.resource === 'results' && event.id === Number(forms.result.event_id)
+      ? true
+      : !hasAllMedals(event),
+  )
+  const selectedResultEvent = events.find((event) => event.id === Number(forms.result.event_id))
+  const availableMedalOptions = medalOptions.filter((option) =>
+    editing?.resource === 'results' && forms.result.medal === option.value
+      ? true
+      : !selectedResultEvent || !hasMedal(selectedResultEvent, option.value),
+  )
 
   async function login(event) {
     event.preventDefault()
@@ -138,6 +155,19 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
     }))
   }
 
+  function updateResultEventSelection(eventId) {
+    const nextEvent = events.find((event) => event.id === Number(eventId))
+    const nextMedal = medalOptions.find((option) => !nextEvent || !hasMedal(nextEvent, option.value))?.value ?? 'gold'
+
+    setForms((current) => ({
+      ...current,
+      result: {
+        ...current.result,
+        event_id: eventId,
+        medal: hasMedal(nextEvent, current.result.medal) ? nextMedal : current.result.medal,
+      },
+    }))
+  }
   function cancelEdit(payloadKey) {
     setEditing(null)
     setForms((current) => ({ ...current, [payloadKey]: defaultForms[payloadKey] }))
@@ -645,12 +675,7 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
         <AdminSection
           title="บันทึกเหรียญ"
           description="เลือกหนึ่งทีมต่อหนึ่งรายการแข่งขัน"
-          items={events.flatMap((event) =>
-            (event.results ?? []).map((result) => ({
-              ...result,
-              eventName: eventOptionLabel(event),
-            })),
-          )}
+          items={resultItems}
           renderItem={(result) => (
             <>
               <span className={`medal ${result.medal}`}>{medalLabels[result.medal]}</span>
@@ -670,11 +695,11 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
           >
             <select
               value={forms.result.event_id}
-              onChange={(event) => updateForm('result', 'event_id', event.target.value)}
+              onChange={(event) => updateResultEventSelection(event.target.value)}
               required
             >
               <option value="">เลือกรายการแข่งขัน</option>
-              {events.map((event) => (
+              {availableResultEvents.map((event) => (
                 <option key={event.id} value={event.id}>
                   {eventOptionLabel(event)}
                 </option>
@@ -696,9 +721,11 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
               value={forms.result.medal}
               onChange={(event) => updateForm('result', 'medal', event.target.value)}
             >
-              <option value="gold">ทอง</option>
-              <option value="silver">เงิน</option>
-              <option value="bronze">ทองแดง</option>
+              {availableMedalOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
             <input
               placeholder="หมายเหตุ"
@@ -720,4 +747,17 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
       )}
     </section>
   )
+}
+const medalOptions = [
+  { value: 'gold', label: 'ทอง' },
+  { value: 'silver', label: 'เงิน' },
+  { value: 'bronze', label: 'ทองแดง' },
+]
+
+function hasMedal(event, medal) {
+  return Boolean(event?.results?.some((result) => result.medal === medal))
+}
+
+function hasAllMedals(event) {
+  return medalOptions.every((option) => hasMedal(event, option.value))
 }
