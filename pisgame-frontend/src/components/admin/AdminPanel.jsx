@@ -171,6 +171,19 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
     }))
   }
 
+  function editResult(result) {
+    setEditing({ resource: 'results', id: result.id })
+    setForms((current) => ({
+      ...current,
+      result: {
+        event_id: result.event_id ? String(result.event_id) : '',
+        team_id: result.team_id ? String(result.team_id) : '',
+        medal: result.medal ?? 'gold',
+        note: result.note ?? '',
+      },
+    }))
+  }
+
   function viewDetail(resource, item) {
     if (selectedDetail?.resource === resource && selectedDetail.item.id === item.id) {
       setSelectedDetail(null)
@@ -645,13 +658,14 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
               <span>{result.eventName}</span>
             </>
           )}
+          onEdit={editResult}
           onDelete={(result) => deleteResource('results', result.id)}
         >
           <form
             className="admin-form grid-form"
             onSubmit={(event) => {
               event.preventDefault()
-              createResource('results', 'result')
+              saveResource('results', 'result')
             }}
           >
             <select
@@ -691,9 +705,16 @@ export function AdminPanel({ token, setToken, teams, sports, events, reload }) {
               value={forms.result.note}
               onChange={(event) => updateForm('result', 'note', event.target.value)}
             />
-            <button className="primary-button" disabled={busy} type="submit">
-              บันทึกเหรียญ
-            </button>
+            <div className="form-actions">
+              <button className="primary-button" disabled={busy} type="submit">
+                {editing?.resource === 'results' ? 'บันทึกการแก้ไข' : 'บันทึกเหรียญ'}
+              </button>
+              {editing?.resource === 'results' && (
+                <button className="ghost-button" disabled={busy} type="button" onClick={() => cancelEdit('result')}>
+                  ยกเลิก
+                </button>
+              )}
+            </div>
           </form>
         </AdminSection>
       )}
